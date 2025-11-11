@@ -307,21 +307,21 @@ def eventhub_trigger(event: List[func.EventHubEvent]) -> None:
             @deadletter_on_exception(f"buckets_{seq_start}-{seq_end}", ndjson_path)
             def process_buckets():
                 bucket_df = _transform_buckets(ndjson_path)
-                logging.info("Bucket explode produced %d row(s).", len(bucket_df))
+                # logging.info("Bucket explode produced %d row(s).", len(bucket_df))
                 write_with_retry(bucket_df, table="orderupdates_rowstream", source="Tables/stream")
                 return "buckets done"
             
             @deadletter_on_exception(f"orders_{seq_start}-{seq_end}", ndjson_path)
             def process_orders():
                 orders_df = _transform_orders(ndjson_path)
-                logging.info("Order stream produced %d row(s).", len(orders_df))
+                # logging.info("Order stream produced %d row(s).", len(orders_df))
                 write_with_retry(orders_df, table="orderupdates_orderstream", source="Tables/stream")
                 return "orders done"
             
             @deadletter_on_exception(f"payments_{seq_start}-{seq_end}", ndjson_path)
             def process_payments():
                 payments_df = _transform_payments(ndjson_path)
-                logging.info("Payment stream produced %d row(s).", len(payments_df))
+                # logging.info("Payment stream produced %d row(s).", len(payments_df))
                 write_with_retry(payments_df, table="orderupdates_paymentstream", source="Tables/stream")
                 return "payments done"
             
