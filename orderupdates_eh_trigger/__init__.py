@@ -15,7 +15,7 @@ app = func.Blueprint()
 
 EVENT_HUB_NAME = "evh-orderupdated-prod"
 EVENT_HUB_CONN = "eventhub_connectionstring"
-EVENT_HUB_CONSUMER = os.getenv('eventhub_consumer_group_4', 'func-edp-prod-04')
+EVENT_HUB_CONSUMER = os.getenv('eventhub_consumer_group_4', 'func-edp-prod-local')
 
 
 # --- Helpers ----------------------------------------------------------------
