@@ -1,0 +1,27 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/schedules/1.0.0/schema.json",
+  "schedules": [
+    {
+      "enabled": true,
+      "jobType": "Execute",
+      "configuration": {
+        "type": "Cron",
+        "startDateTime": "2025-10-10T10:55:00",
+        "endDateTime": "2026-01-31T17:00:00",
+        "localTimeZoneId": "Romance Standard Time",
+        "interval": 5
+      }
+    },
+    {
+      "enabled": false,
+      "jobType": "Execute",
+      "configuration": {
+        "type": "Cron",
+        "startDateTime": "2025-10-14T11:45:00",
+        "endDateTime": "2026-01-31T11:26:00",
+        "localTimeZoneId": "Romance Standard Time",
+        "interval": 15
+      }
+    }
+  ]
+}
