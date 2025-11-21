@@ -32,7 +32,9 @@ from tqdm.notebook import tqdm # Use tqdm.notebook for better notebook integrati
 DATABASE_NAME = 'stream'      # e.g., "my_lakehouse_db" or None for default
 TABLE_PREFIX = ""         # e.g., "fact_" or "" for all tables
 MAX_PARALLEL_WORKERS = 5  # Adjust parallelism
-VACUUM_RETAIN_HOURS = 168 # Explicit retention (e.g., 168 for 7 days). Use None for default VACUUM. Avoid 0.
+VACUUM_RETAIN_HOURS = 1 # Explicit retention (e.g., 168 for 7 days). Use None for default VACUUM. Avoid 0.
+
+spark.sql("SET `spark.databricks.delta.retentionDurationCheck.enabled` = false")
 
 # --- Helper Function to Run SQL Commands ---
 # (Handles SQL execution, view checks, basic errors - slightly updated for clarity)
@@ -78,8 +80,10 @@ def run_maintenance_on_table(full_table_name):
     result.update({"optimized": opt_res["success"], "optimize_error": opt_res["error"], "is_view": opt_res["is_view"]})
 
     # 2. Vacuum (only if OPTIMIZE didn't detect it as a view)
+    #SET TBLPROPERTIES ('delta.logRetentionDuration'='interval 1 minutes', 'delta.deletedFileRetentionDuration'='interval 1 minutes');
     if not result["is_view"]:
         if VACUUM_RETAIN_HOURS is not None:
+            spark.sql(f"ALTER TABLE {full_table_name} SET TBLPROPERTIES ('delta.logRetentionDuration'='interval 1 minutes')")
             vac_sql = f"VACUUM {full_table_name} RETAIN {VACUUM_RETAIN_HOURS} HOURS"
         else:
             vac_sql = f"VACUUM {full_table_name}" # Default retention (may fail check)
@@ -191,8 +195,16 @@ finally:
 
 # CELL ********************
 
-# display(spark.sql("show tables in stream"))
-# abfss://fb736e26-5db5-424b-8125-6f2ab29a83f0@onelake.dfs.fabric.microsoft.com/408d8412-c973-46aa-8c0c-52dbe1c38ada/Tables/stream/orderupdated_rowstream
+# from pyspark.sql.functions import col
+# # display(spark.sql("show tables in stream"))
+# # abfss://fb736e26-5db5-424b-8125-6f2ab29a83f0@onelake.dfs.fabric.microsoft.com/408d8412-c973-46aa-8c0c-52dbe1c38ada/Tables/stream/orderupdated_rowstream
+# df = spark.table('stream.orderupdates_orderstream')
+# df = df.withColumn("orderDate", col("orderDate").cast("timestamp"))
+
+# display(df)
+
+# df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("stream.orderupdates_orderstream")
+
 
 # METADATA ********************
 
